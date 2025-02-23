@@ -195,22 +195,49 @@
 
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Phone, Lock, ArrowRight, Stethoscope, ClipboardCheck } from 'lucide-react';
+import { register } from '../services/auth.service';
+import { FaAddressBook, FaCalendar } from 'react-icons/fa';
+import { BsGenderAmbiguous } from 'react-icons/bs';
+import GENDERS from "../constants/genders";
+import useAlert from '../hooks/useAlert';
 
 function Register() {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    email: '',
+    username: '',
     phone: '',
     password: '',
     confirmPassword: '',
+    dob: '',
+    gender: GENDERS[Object.keys(GENDERS)[0]],
+    address: '',
     agreeToTerms: false,
   });
+  const { setAlert } = useAlert();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    const registrationInfo = await register({
+      username: formData.username,
+      password: formData.password,
+      confirmPassword: formData.confirmPassword,
+      contact: formData.phone,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      dob: formData.dob,
+      gender: formData.gender,
+      address: formData.address,
+    })
+    if (registrationInfo.success) {
+      setAlert("Registration complete ", "success");
+      navigate('/login');
+    } else {
+      setAlert(registrationInfo.message, "error");
+    }
     console.log('Registration submitted:', formData);
   };
 
@@ -285,19 +312,19 @@ function Register() {
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+              Username
             </label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
-                id="email"
-                name="email"
-                type="email"
+                id="username"
+                name="username"
+                type="text"
                 required
                 className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                placeholder="doctor@example.com"
-                value={formData.email}
+                placeholder="narendramodi123"
+                value={formData.username}
                 onChange={handleChange}
               />
             </div>
@@ -359,6 +386,64 @@ function Register() {
                   onChange={handleChange}
                 />
               </div>
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+              Address
+            </label>
+            <div className="relative">
+              <FaAddressBook className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                id="address"
+                name="address"
+                type="text"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                placeholder="045, 10th cross, 5th stage, Marathalli, Bengaluru"
+                value={formData.address}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+              Date of birth
+            </label>
+            <div className="relative">
+              <FaCalendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                id="dob"
+                name="dob"
+                type="date"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                // placeholder=""
+                value={formData.dob}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+              Gender
+            </label>
+            <div className="relative">
+              <BsGenderAmbiguous className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <select
+                id="gender"
+                name="gender"
+                required
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                // placeholder=""
+                value={formData.gender}
+                onChange={handleChange}
+              >
+                {Object.keys(GENDERS).map((gender, index) => {
+                  return <option key={index} value={GENDERS[gender]}>{gender.toLowerCase()}</option>
+                })}
+              </select>
             </div>
           </div>
 

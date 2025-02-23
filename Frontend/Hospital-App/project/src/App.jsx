@@ -12,25 +12,37 @@ import BookAppointment from './pages/BookAppointment';
 import BookingConfirmation from './pages/BookingConfirmation';
 import UserDashboard from './pages/UserDashboard';
 import AdminPanel from './pages/AdminPanel';
+import AlertPopup from './components/Popup';
+import { useAuth } from './hooks/useAuth';
+import NotFound from './pages/NotFound';
 
 function App() {
+  const { user, token } = useAuth();
   return (
     <Router>
+      <AlertPopup></AlertPopup>
       <div className="min-h-screen bg-white flex flex-col">
         <Navbar />
         <main className="flex-grow">
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Home />}/>
+            {!token && [
+              <Route key={1} path="/login" element={<Login />} />,
+              <Route key={2} path="/register" element={<Register />} />
+            ]}
+
+            {token && [
+              <Route path="/dashboard" element={<UserDashboard />} />
+            ]}
+            
             <Route path="/doctors" element={<AllDoctors />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
             <Route path="/doctor/:id" element={<DoctorProfile />} />
             <Route path="/book-appointment/:id" element={<BookAppointment />} />
             <Route path="/booking-confirmation" element={<BookingConfirmation />} />
-            <Route path="/dashboard" element={<UserDashboard />} />
             <Route path="/admin" element={<AdminPanel />} />
+            <Route path="*" element={<NotFound/>}></Route>
           </Routes>
         </main>
         <Footer />

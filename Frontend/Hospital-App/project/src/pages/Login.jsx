@@ -146,19 +146,37 @@
 
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, Stethoscope } from 'lucide-react';
+import useAlert from '../hooks/useAlert';
+import { login } from '../services/auth.service';
+import { useAuth } from '../hooks/useAuth';
 
 function Login() {
+  const { setAlert } = useAlert();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: '',
+    username: '',
     password: '',
     rememberMe: false,
   });
 
-  const handleSubmit = (e) => {
+  const { refreshAuth } = useAuth();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login submitted:', formData);
+    const loginInfo = await login({
+      username: formData.username,
+      password: formData.password
+    })
+    if (loginInfo.success) {
+      setAlert("Logged in successfully !!!", "success");
+      refreshAuth();
+      navigate('/');
+    } else {
+      setAlert(loginInfo.message || "Login failed !!!", "error")
+    }
+
   };
 
   const handleChange = (e) => {
@@ -192,19 +210,19 @@ function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+              Username
             </label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
-                id="email"
-                name="email"
-                type="email"
+                id="username"
+                name="username"
+                type="text"
                 required
                 className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                placeholder="doctor@example.com"
-                value={formData.email}
+                placeholder="doctor1234"
+                value={formData.username}
                 onChange={handleChange}
               />
             </div>
