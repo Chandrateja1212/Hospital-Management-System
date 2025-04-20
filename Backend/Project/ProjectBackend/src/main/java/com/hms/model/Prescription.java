@@ -19,7 +19,7 @@ import lombok.Data;
 @Table(name = "prescription")
 @Data
 public class Prescription {
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long prescriptionId;
 
